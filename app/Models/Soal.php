@@ -28,6 +28,8 @@ class Soal extends Model
 
     public function getTanggalSoalAttribute()
     {
+        if (!isset($this->detail['tanggal']))
+            return '';
         Carbon::setLocale('id');
         return Carbon::createFromFormat('Y-m-d', $this->detail['tanggal'])
             ->translatedFormat('l / d F Y');
