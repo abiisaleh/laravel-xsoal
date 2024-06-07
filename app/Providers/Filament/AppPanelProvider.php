@@ -34,6 +34,7 @@ class AppPanelProvider extends PanelProvider
             ->profile()
             ->registration()
             ->passwordReset()
+            ->emailVerification()
             ->tenant(Team::class)
             ->tenantRegistration(RegisterTeam::class)
             ->tenantProfile(EditTeamProfile::class)
