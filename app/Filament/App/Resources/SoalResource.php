@@ -183,7 +183,7 @@ class SoalResource extends Resource
                             $jumlahEssay = collect($soal->essay)->count();
 
                             //generate dari template
-                            $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('doc/Template-full.docx');
+                            $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor('doc/Template-full-col-1.docx');
 
                             $param = [
                                 'sekolah' => $soal->team->name ?? '',
@@ -226,7 +226,8 @@ class SoalResource extends Resource
                                     $templateProcessor->setValue('gambar#' . $no, '');
 
                                 foreach ($pilihan_ganda['opsi'] as $jawaban)
-                                    $opsi[]['jawabanPG#' . $no] = $jawaban;
+                                    if ($jawaban != '')
+                                        $opsi[]['jawabanPG#' . $no] = $jawaban;
 
                                 $templateProcessor->cloneBlock('opsi#' . $no, 0, true, false, $opsi);
                             }
