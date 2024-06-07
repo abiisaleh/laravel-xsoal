@@ -9,6 +9,7 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,6 +31,7 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('nama')
                     ->required()
                     ->placeholder('Tahun Ajaran 2023/2024'),
+                Forms\Components\ColorPicker::make('warna')
             ]);
     }
 
@@ -38,6 +40,8 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
+                    ->badge()
+                    ->color(fn (Category $record) => Color::hex($record->warna)),
             ])
             ->filters([
                 //

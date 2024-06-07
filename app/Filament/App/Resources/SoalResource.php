@@ -4,6 +4,7 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Resources\SoalResource\Pages;
 use App\Filament\Resources\SoalResource\RelationManagers;
+use App\Infolists\Components\ListItemEntry;
 use App\Models\Soal;
 use App\Models\User;
 use Filament\Forms;
@@ -16,6 +17,7 @@ use Filament\Forms\Set;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,6 +33,8 @@ class SoalResource extends Resource
 
     protected static ?string $navigationGroup = 'Arsip';
 
+    protected static ?string $recordTitleAttribute = 'judul';
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
@@ -40,13 +44,15 @@ class SoalResource extends Resource
                     ->schema([
                         Infolists\Components\TextEntry::make('judul'),
                         Infolists\Components\TextEntry::make('category.nama')
-                            ->badge(),
+                            ->badge()
+                            ->color(fn (Soal $record) => Color::hex($record->category->warna)),
                         Infolists\Components\TextEntry::make('user.name')
                             ->label('Penulis'),
                         Infolists\Components\TextEntry::make('jumlah_soal'),
                     ]),
 
                 Infolists\Components\Section::make('Detail soal')
+                    ->collapsible()
                     ->columns(3)
                     ->schema([
                         Infolists\Components\TextEntry::make('detail.studi')->label('Studi'),
@@ -59,45 +65,11 @@ class SoalResource extends Resource
 
                     ]),
 
-                Infolists\Components\RepeatableEntry::make('pilihan_ganda')
+                Infolists\Components\Section::make('Soal')
                     ->schema([
-                        Infolists\Components\TextEntry::make('pertanyaan')
-                            ->prefix('1. ')
-                            ->hiddenLabel()
-                            ->prefix(function (Soal $record, $state) {
-                                $haystack = array_map(fn ($item) => $item['pertanyaan'], $record->pilihan_ganda);
-
-                                $key = array_search($state, $haystack);
-
-                                $keys = array_keys($haystack);
-
-                                $position = array_search($key, $keys) + 1;
-
-                                return $position . '. ';
-                            }),
-                        Infolists\Components\ImageEntry::make('gambar')
-                            ->hidden(fn ($state) => is_null($state)),
-                        Infolists\Components\TextEntry::make('opsi'),
-                    ]),
-                Infolists\Components\RepeatableEntry::make('essay')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('pertanyaan')
-                            ->hiddenLabel()
-                            ->prefix(function (Soal $record, $state) {
-                                $haystack = array_map(fn ($item) => $item['pertanyaan'], $record->essay);
-
-                                $key = array_search($state, $haystack);
-
-                                $keys = array_keys($haystack);
-
-                                $position = array_search($key, $keys) + 1;
-
-                                return $position . '. ';
-                            }),
-                        Infolists\Components\ImageEntry::make('gambar')
-                            ->hidden(fn ($state) => is_null($state))
-                            ->hiddenLabel(),
-                    ]),
+                        ListItemEntry::make('pilihan_ganda'),
+                        ListItemEntry::make('essay'),
+                    ])
             ]);
     }
 
@@ -180,6 +152,7 @@ class SoalResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')->label('Penulis'),
                 Tables\Columns\TextColumn::make('category.nama')
                     ->badge()
+                    ->color(fn (Soal $record) => Color::hex($record->category->warna))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jumlah_soal'),
 
@@ -312,6 +285,7 @@ class SoalResource extends Resource
             'create' => Pages\CreateSoal::route('/create'),
             'edit' => Pages\EditSoal::route('/{record}/edit'),
             'view' => Pages\ViewSoal::route('/{record}/view'),
+            'print' => Pages\PrintSoal::route('/{record}/print'),
         ];
     }
 
